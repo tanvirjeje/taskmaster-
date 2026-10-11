@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TaskMaster - প্রতিদিন কুইজ খেলে আয় করুন</title>
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #0B0F19; color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; padding: 15px; }
@@ -21,7 +18,6 @@
         .info-box p { color: #CBD5E1; font-size: 13px; line-height: 1.6; }
         .btn { width: 100%; padding: 14px; border: none; border-radius: 12px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.2s; text-align: center; text-decoration: none; display: block; }
         .btn-primary { background-color: #2563EB; color: #ffffff; box-shadow: 0 4px 12px rgba(37,99,235,0.4); }
-        .btn-primary:active { background-color: #1d4ed8; }
         .btn-success { background-color: #059669; color: #ffffff; box-shadow: 0 4px 12px rgba(5,150,105,0.4); margin-top: 15px; }
         .btn-secondary { background-color: #334155; color: #CBD5E1; margin-top: 10px; font-size: 13px; padding: 10px; }
         .form-group { margin-bottom: 15px; width: 100%; }
@@ -37,17 +33,13 @@
 <body>
 
     <div class="container">
-        <!-- লোগো ও হেডার -->
         <div class="header">
             <img src="logo.png" alt="TaskMaster Logo" class="logo">
             <h1 class="title">TaskMaster</h1>
             <p class="subtitle">বাংলাদেশের সেরা টাস্ক ও কুইজ আর্নিং প্ল্যাটফর্ম</p>
         </div>
 
-        <!-- মূল কার্ড বক্স -->
         <div class="card">
-            
-            <!-- ১. অ্যাপের বিবরণ (ল্যান্ডিং ইনফো) -->
             <div id="infoSection">
                 <div class="info-box">
                     <h3>✨ কেন TaskMaster ব্যবহার করবেন?</h3>
@@ -56,14 +48,13 @@
                 <button type="button" class="btn btn-primary" onclick="showRegisterForm()">✍️ অ্যাকাউন্ট তৈরি করতে রেজিস্ট্রেশন করুন</button>
             </div>
 
-            <!-- ২. রেজিস্ট্রেশন ফর্ম -->
             <div id="formSection" class="hidden">
                 <div style="text-align: center; margin-bottom: 15px;">
                     <h2 style="color: #38BDF8; font-size: 18px; font-weight: bold;">রেজিস্ট্রেশন ফর্ম</h2>
                     <p style="color: #94A3B8; font-size: 12px; margin-top: 2px;">নতুন অ্যাকাউন্ট তৈরি করতে তথ্যগুলো পূরণ করুন</p>
                 </div>
 
-                <form id="regForm" onsubmit="handleRegistration(event)">
+                <form id="regForm">
                     <div class="form-group">
                         <input type="text" id="name" required placeholder="আপনার নাম" class="input-field">
                     </div>
@@ -77,7 +68,6 @@
                         <input type="password" id="confirmPassword" required placeholder="কনফার্ম পাসওয়ার্ড" class="input-field">
                     </div>
 
-                    <!-- রেফার কোড (অটো-রিড হবে) -->
                     <input type="hidden" id="referCode">
 
                     <button type="submit" id="btnSubmit" class="btn btn-success">নিশ্চিত করুন (রেজিস্ট্রেশন)</button>
@@ -85,7 +75,6 @@
                 </form>
             </div>
 
-            <!-- ৩. সফল রেজিস্ট্রেশন ও অ্যাপ ডাউনলোড সেকশন -->
             <div id="successSection" class="hidden">
                 <div class="success-icon">🎉</div>
                 <div class="success-text">রেজিস্ট্রেশন সফল হয়েছে!</div>
@@ -103,41 +92,42 @@
         <p>© 2026 TaskMaster. All Rights Reserved.</p>
     </div>
 
-    <!-- ফায়ারবেজ ও জাভাস্ক্রিপ্ট লজিক -->
-    <script>
-        // আপনার ফায়ারবেজ কনফিগারেশন এখানে বসাবেন
+    <!-- ফায়ারবেজ মডিউলার স্ক্রিপ্ট -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
+        import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-database.js";
+
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            databaseURL: "YOUR_DATABASE_URL",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyAYuUMENUTKwSGs7y4gzJeskUaoDSSrC_I",
+            authDomain: "private-message-78850.firebaseapp.com",
+            databaseURL: "https://private-message-78850-default-rtdb.firebaseio.com",
+            projectId: "private-message-78850",
+            storageBucket: "private-message-78850.firebasestorage.app",
+            messagingSenderId: "843499614608",
+            appId: "1:843499614608:web:2a626e49f288605a950315"
         };
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
-        // URL থেকে রেফার কোড রিড করা
         const urlParams = new URLSearchParams(window.location.search);
         const refParam = urlParams.get('ref');
         if (refParam) {
             document.getElementById('referCode').value = refParam;
         }
 
-        function showRegisterForm() {
+        window.showRegisterForm = function() {
             document.getElementById('infoSection').classList.add('hidden');
             document.getElementById('formSection').classList.remove('hidden');
         }
 
-        function backToInfo() {
+        window.backToInfo = function() {
             document.getElementById('formSection').classList.add('hidden');
             document.getElementById('infoSection').classList.remove('hidden');
         }
 
-        function handleRegistration(e) {
-            e.preventDefault(); // পেজ রিলোড হওয়া আটকানোর জন্য
+        document.getElementById('regForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
 
             const name = document.getElementById('name').value.trim();
             const phone = document.getElementById('phone').value.trim();
@@ -159,8 +149,10 @@
             btnSubmit.innerText = "যাচাই করা হচ্ছে...";
             btnSubmit.disabled = true;
 
-            // ফায়ারবেজে চেক করা নম্বর দিয়ে একাউন্ট আছে কি না
-            db.ref('Users').child(phone).once('value', snapshot => {
+            try {
+                const userRef = ref(db, 'Users/' + phone);
+                const snapshot = await get(userRef);
+
                 if (snapshot.exists()) {
                     alert("এই মোবাইল নম্বর দিয়ে ইতিমধ্যে অ্যাকাউন্ট খোলা হয়েছে!");
                     btnSubmit.innerText = "নিশ্চিত করুন (রেজিস্ট্রেশন)";
@@ -182,20 +174,17 @@
                         referredBy: referCode || ""
                     };
 
-                    db.ref('Users').child(phone).set(userData)
-                        .then(() => {
-                            // সফলভাবে সেভ হলে সরাসরি ডাউনলোড পেজ শো করবে
-                            document.getElementById('formSection').classList.add('hidden');
-                            document.getElementById('successSection').classList.remove('hidden');
-                        })
-                        .catch(error => {
-                            alert("ত্রুটি: " + error.message);
-                            btnSubmit.innerText = "নিশ্চিত করুন (রেজিস্ট্রেশন)";
-                            btnSubmit.disabled = false;
-                        });
+                    await set(userRef, userData);
+
+                    document.getElementById('formSection').classList.add('hidden');
+                    document.getElementById('successSection').classList.remove('hidden');
                 }
-            });
-        }
+            } catch (error) {
+                alert("ত্রুটি: " + error.message);
+                btnSubmit.innerText = "নিশ্চিত করুন (রেজিস্ট্রেশন)";
+                btnSubmit.disabled = false;
+            }
+        });
     </script>
 </body>
 </html>
