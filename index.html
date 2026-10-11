@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskMaster - প্রতিদিন কুইজ খেলে আয় করুন</title>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #0B0F19; color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; padding: 15px; }
+        .container { width: 100%; max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; flex-grow: 1; justify-content: center; }
+        .header { width: 100%; text-align: center; margin-bottom: 20px; }
+        .logo { width: 90px; height: 90px; border-radius: 20px; object-fit: cover; border: 2px solid #334155; margin-bottom: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .title { font-size: 26px; font-weight: 800; color: #FACC15; }
+        .subtitle { font-size: 13px; color: #94A3B8; margin-top: 4px; }
+        .card { width: 100%; background-color: #131B2E; padding: 24px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); border: 1px solid #1E293B; }
+        .info-box { background-color: #1B263B; padding: 16px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #334155; text-align: left; }
+        .info-box h3 { color: #38BDF8; font-size: 15px; margin-bottom: 8px; font-weight: bold; }
+        .info-box p { color: #CBD5E1; font-size: 13px; line-height: 1.6; }
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 12px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.2s; text-align: center; text-decoration: none; display: block; }
+        .btn-primary { background-color: #2563EB; color: #ffffff; box-shadow: 0 4px 12px rgba(37,99,235,0.4); }
+        .btn-primary:active { background-color: #1d4ed8; }
+        .btn-success { background-color: #059669; color: #ffffff; box-shadow: 0 4px 12px rgba(5,150,105,0.4); margin-top: 15px; }
+        .btn-secondary { background-color: #334155; color: #CBD5E1; margin-top: 10px; font-size: 13px; padding: 10px; }
+        .form-group { margin-bottom: 15px; width: 100%; }
+        .input-field { width: 100%; background-color: #1B263B; border: 1px solid #334155; border-radius: 12px; padding: 14px; color: #ffffff; font-size: 14px; outline: none; }
+        .input-field:focus { border-color: #38BDF8; }
+        .hidden { display: none !important; }
+        .success-icon { font-size: 55px; margin-bottom: 10px; text-align: center; }
+        .success-text { text-align: center; font-size: 20px; font-weight: bold; margin-bottom: 8px; color: #34D399; }
+        .success-desc { text-align: center; font-size: 13px; color: #CBD5E1; line-height: 1.5; margin-bottom: 20px; }
+        .footer { width: 100%; text-align: center; font-size: 11px; color: #64748B; padding: 15px 0; border-top: 1px solid #1E293B; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- লোগো ও হেডার -->
+        <div class="header">
+            <img src="logo.png" alt="TaskMaster Logo" class="logo">
+            <h1 class="title">TaskMaster</h1>
+            <p class="subtitle">বাংলাদেশের সেরা টাস্ক ও কুইজ আর্নিং প্ল্যাটফর্ম</p>
+        </div>
+
+        <!-- মূল কার্ড বক্স -->
+        <div class="card">
+            
+            <!-- ১. অ্যাপের বিবরণ (ল্যান্ডিং ইনফো) -->
+            <div id="infoSection">
+                <div class="info-box">
+                    <h3>✨ কেন TaskMaster ব্যবহার করবেন?</h3>
+                    <p>• প্রতিদিন সহজ কুইজ বা টাস্ক পূরণ করে নিশ্চিত ইনকাম।<br>• ৩-লেভেল পর্যন্ত আকর্ষণীয় রেফারেল কমিশন সিস্টেম।<br>• বিকাশ ও নগদের মাধ্যমে দ্রুত পেমেন্ট উইথড্র সুবিধা।</p>
+                </div>
+                <button type="button" class="btn btn-primary" onclick="showRegisterForm()">✍️ অ্যাকাউন্ট তৈরি করতে রেজিস্ট্রেশন করুন</button>
+            </div>
+
+            <!-- ২. রেজিস্ট্রেশন ফর্ম -->
+            <div id="formSection" class="hidden">
+                <div style="text-align: center; margin-bottom: 15px;">
+                    <h2 style="color: #38BDF8; font-size: 18px; font-weight: bold;">রেজিস্ট্রেশন ফর্ম</h2>
+                    <p style="color: #94A3B8; font-size: 12px; margin-top: 2px;">নতুন অ্যাকাউন্ট তৈরি করতে তথ্যগুলো পূরণ করুন</p>
+                </div>
+
+                <form id="regForm" onsubmit="handleRegistration(event)">
+                    <div class="form-group">
+                        <input type="text" id="name" required placeholder="আপনার নাম" class="input-field">
+                    </div>
+                    <div class="form-group">
+                        <input type="tel" id="phone" required placeholder="মোবাইল নম্বর" class="input-field">
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="password" required placeholder="পাসওয়ার্ড" class="input-field">
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="confirmPassword" required placeholder="কনফার্ম পাসওয়ার্ড" class="input-field">
+                    </div>
+
+                    <!-- রেফার কোড (অটো-রিড হবে) -->
+                    <input type="hidden" id="referCode">
+
+                    <button type="submit" id="btnSubmit" class="btn btn-success">নিশ্চিত করুন (রেজিস্ট্রেশন)</button>
+                    <button type="button" class="btn btn-secondary" onclick="backToInfo()">← পেছনে ফিরে যান</button>
+                </form>
+            </div>
+
+            <!-- ৩. সফল রেজিস্ট্রেশন ও অ্যাপ ডাউনলোড সেকশন -->
+            <div id="successSection" class="hidden">
+                <div class="success-icon">🎉</div>
+                <div class="success-text">রেজিস্ট্রেশন সফল হয়েছে!</div>
+                <div class="success-desc">আপনার অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে। এখন আমাদের অফিসিয়াল অ্যাপটি ডাউনলোড করুন এবং আপনার একাউন্ট দিয়ে লগইন করে কাজ শুরু করুন।</div>
+                
+                <a href="app-release.apk" id="downloadBtn" class="btn btn-primary" style="background-color: #0284C7; text-align: center;">
+                    📥 অফিসিয়াল অ্যাপ ডাউনলোড করুন (APK)
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>© 2026 TaskMaster. All Rights Reserved.</p>
+    </div>
+
+    <!-- ফায়ারবেজ ও জাভাস্ক্রিপ্ট লজিক -->
+    <script>
+        // আপনার ফায়ারবেজ কনফিগারেশন এখানে বসাবেন
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            databaseURL: "YOUR_DATABASE_URL",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // URL থেকে রেফার কোড রিড করা
+        const urlParams = new URLSearchParams(window.location.search);
+        const refParam = urlParams.get('ref');
+        if (refParam) {
+            document.getElementById('referCode').value = refParam;
+        }
+
+        function showRegisterForm() {
+            document.getElementById('infoSection').classList.add('hidden');
+            document.getElementById('formSection').classList.remove('hidden');
+        }
+
+        function backToInfo() {
+            document.getElementById('formSection').classList.add('hidden');
+            document.getElementById('infoSection').classList.remove('hidden');
+        }
+
+        function handleRegistration(e) {
+            e.preventDefault(); // পেজ রিলোড হওয়া আটকানোর জন্য
+
+            const name = document.getElementById('name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const confirmPassword = document.getElementById('confirmPassword').value.trim();
+            const referCode = document.getElementById('referCode').value.trim();
+            const btnSubmit = document.getElementById('btnSubmit');
+
+            if (!name || !phone || !password || !confirmPassword) {
+                alert("সবগুলো ঘর পূরণ করুন!");
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                alert("পাসওয়ার্ড মিলছে না!");
+                return;
+            }
+
+            btnSubmit.innerText = "যাচাই করা হচ্ছে...";
+            btnSubmit.disabled = true;
+
+            // ফায়ারবেজে চেক করা নম্বর দিয়ে একাউন্ট আছে কি না
+            db.ref('Users').child(phone).once('value', snapshot => {
+                if (snapshot.exists()) {
+                    alert("এই মোবাইল নম্বর দিয়ে ইতিমধ্যে অ্যাকাউন্ট খোলা হয়েছে!");
+                    btnSubmit.innerText = "নিশ্চিত করুন (রেজিস্ট্রেশন)";
+                    btnSubmit.disabled = false;
+                } else {
+                    const currentDate = new Date().toISOString().split('T')[0];
+
+                    const userData = {
+                        name: name,
+                        phone: phone,
+                        password: password,
+                        balance: 0.0,
+                        referEarnings: 0.0,
+                        status: "Active",
+                        role: "User",
+                        joinDate: currentDate,
+                        active_package_name: "Free Trial",
+                        packageLevel: 0,
+                        referredBy: referCode || ""
+                    };
+
+                    db.ref('Users').child(phone).set(userData)
+                        .then(() => {
+                            // সফলভাবে সেভ হলে সরাসরি ডাউনলোড পেজ শো করবে
+                            document.getElementById('formSection').classList.add('hidden');
+                            document.getElementById('successSection').classList.remove('hidden');
+                        })
+                        .catch(error => {
+                            alert("ত্রুটি: " + error.message);
+                            btnSubmit.innerText = "নিশ্চিত করুন (রেজিস্ট্রেশন)";
+                            btnSubmit.disabled = false;
+                        });
+                }
+            });
+        }
+    </script>
+</body>
+</html>
