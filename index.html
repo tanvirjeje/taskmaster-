@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaskMaster - প্রতিদিন কুইজ খেলে আয় করুন</title>
+    <title id="pageTitle">TaskMaster - প্রতিদিন কুইজ খেলে আয় করুন</title>
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js" type="module"></script>
     <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-database.js" type="module"></script>
@@ -40,8 +40,8 @@
         <!-- লোগো ও হেডার -->
         <div class="header">
             <img id="appLogo" src="logo.png" alt="TaskMaster Logo" class="logo">
-            <h1 class="title">TaskMaster</h1>
-            <p class="subtitle">বাংলাদেশের সেরা টাস্ক ও কুইজ আর্নিং প্ল্যাটফর্ম</p>
+            <h1 id="webTitle" class="title">TaskMaster</h1>
+            <p id="webSubtitle" class="subtitle">বাংলাদেশের সেরা টাস্ক ও কুইজ আর্নিং প্ল্যাটফর্ম</p>
         </div>
 
         <!-- মূল কার্ড বক্স -->
@@ -121,18 +121,26 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // ফায়ারবেজ থেকে লাইভ লোগো, নোটিশ এবং APK লিংক লোড করা
+        // ফায়ারবেজ থেকে লাইভ টাইটেল, সাবটাইটেল, লোগো, নোটিশ এবং APK লিংক লোড করা
         async function loadWebSettings() {
             try {
                 const settingsRef = ref(db, 'WebSettings');
                 const snapshot = await get(settingsRef);
                 if (snapshot.exists()) {
                     const data = snapshot.val();
+                    
+                    if (data.websiteTitle && data.websiteTitle.trim() !== "") {
+                        document.getElementById('webTitle').innerText = data.websiteTitle;
+                        document.getElementById('pageTitle').innerText = data.websiteTitle + " - প্রতিদিন কুইজ খেলে আয় করুন";
+                    }
+                    if (data.subtitle && data.subtitle.trim() !== "") {
+                        document.getElementById('webSubtitle').innerText = data.subtitle;
+                    }
                     if (data.apkLink && data.apkLink.trim() !== "") {
                         document.getElementById('downloadBtn').href = data.apkLink;
                     }
                     if (data.noticeText && data.noticeText.trim() !== "") {
-                        document.getElementById('noticeText').innerText = data.noticeText;
+                        document.getElementById('noticeText').innerHTML = data.noticeText;
                     }
                     if (data.logoUrl && data.logoUrl.trim() !== "") {
                         document.getElementById('appLogo').src = data.logoUrl;
